@@ -40,7 +40,50 @@ async function run() {
             res.send(result);
         });
 
-        
+        // Get all product data from db for pagination
+
+        app.get("/all-products", async (req, res) => {
+            const size = parseInt(req.query.size);
+            const page = parseInt(req.query.page) - 1;
+            const filter = req.query.filter;
+            const brand = req.query.brand;
+            const sort = req.query.sort;
+            const search = req.query.search;
+            const price = req.query.price;
+            const sort_newest = req.query.sort_newest;
+
+            // console.log(size, page);
+
+            let query = {
+                productName: { $regex: search, $options: "i" },
+            };
+
+            if (filter) query.category = filter;
+            if (brand) query.brand = brand;
+
+            // Handle price range filtering
+            if (price) {
+                const [minPrice, maxPrice] = price.split("-").map(Number);
+                query.price = { $gte: minPrice, $lte: maxPrice };
+            }
+
+            // Handle sorting by price high to low and low to high
+            let options = {};
+            if (sort) options.sort = { price: sort === "asc" ? 1 : -1 };
+
+            // Handle sorting by newest product first show
+            if (sort_newest) {
+                options.sort = { productDate: sort_newest === "dsc" ? -1 : 1 };
+            }
+
+            const result = await productCollection
+                .find(query, options)
+                .skip(page * size)
+                .limit(size)
+                .toArray();
+
+            res.send(result);
+        });
 
         // Get all product data count from db
         app.get("/products-count", async (req, res) => {
