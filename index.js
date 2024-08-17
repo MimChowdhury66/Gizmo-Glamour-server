@@ -33,14 +33,34 @@ async function run() {
 
 
 
-        app.get('/allProducts', async (req, res) => {
-            const result = await productCollection.find().toArray();
-            res.send(result)
-        })
+        // Get all product data from db
+        app.get(`/products`, async (req, res) => {
+            const cursor = productCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        });
 
+        
 
+        // Get all product data count from db
+        app.get("/products-count", async (req, res) => {
+            const filter = req.query.filter;
+            const brand = req.query.brand;
+            const price = req.query.price;
+            const search = req.query.search;
+            let query = {
+                productName: { $regex: search, $options: "i" },
+            };
+            if (filter) query.category = filter;
+            if (brand) query.brand_name = brand;
+            if (price) {
+                const [minPrice, maxPrice] = price.split("-").map(Number);
+                query.price = { $gte: minPrice, $lte: maxPrice };
+            }
+            const count = await productCollection.countDocuments(query);
 
-
+            res.send({ count });
+        });
 
 
 
