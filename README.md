@@ -3,7 +3,7 @@ It is a fullstack mern application, based on makeup items, where users can perfo
 
 
 ## Links:
-- live link -- 
+- live link -- https://gizmo-glamour.web.app/
 - client side repo link -- https://github.com/MimChowdhury66/Gizmo-Glamour-client
 - server side repo link -- https://github.com/MimChowdhury66/Gizmo-Glamour-server
 
